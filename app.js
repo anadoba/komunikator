@@ -14,8 +14,13 @@ app.use('/js/jquery.min.map', static(__dirname + '/bower_components/jquery/dist/
 app.use(static(__dirname + '/public'));
 
 io.sockets.on("connection", function (socket) {
+    socket.on("login", function (data) {
+        io.sockets.emit("chat", "Użytkownik <b>" + data + "</b> dołączył do chatu.");
+        console.log(data);
+    });
     socket.on("message", function (data) {
-        io.sockets.emit("echo", "No tak, tak – dostałem: " + data);
+        io.sockets.emit("chat", "<b>" + data.login + "</b>: " + data.message);
+        console.log(data);
     });
     socket.on("error", function (err) {
         console.dir(err);

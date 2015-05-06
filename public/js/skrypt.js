@@ -34,9 +34,15 @@ $(document).ready(function () {
         socket.on("error", function (err) {
             $('#message').text("Błąd połączenia z serwerem: '" + JSON.stringify(err) + "'");
         });
-        socket.on("echo", function (data) {
-            $('#message').text("Serwer twierdzi, że otrzymał od Ciebie: '" + data + "'");
+        socket.on("chat", function (data) {
+            $('#chat').append(data + "<br />");
         });
+    });
+    
+    // Ustaw login
+    $('#login').click(function () {
+        socket.emit('login', $('#loginText').val());
+        console.log('Zalogowany jako: ' + $('#loginText').val());
     });
     
     // Zamknij połączenie po kliknięciu guzika „Rozłącz”
@@ -51,9 +57,14 @@ $(document).ready(function () {
     
     // Wyślij komunikat do serwera po naciśnięciu guzika „Wyślij”
     $('#send').click(function () {
-        socket.emit('message', $('#text').val());
-        console.log('Wysłałem wiadomość: ' + $('#text').val());
-        $('#text').val("");
+        
+        var json = {
+            "login" : $('#loginText').val(),
+            "message" : $('#messageText').val()    
+        };
+        socket.emit('message', json);
+        console.log('Wysłałem wiadomość: ' + $('#messageText').val());
+        $('#messageText').val("");
     });
 });
 

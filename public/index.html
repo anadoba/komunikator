@@ -16,11 +16,22 @@
         <td> <input id="close" type="button" value="Rozłącz"> </td>
       </tr>
     </table>
+    
+    <p>
+      Login:&nbsp;
+      <input id="loginText">&nbsp;<input id="login" type="button" value="Ustaw">
+    </p>
+    
+    <label>Chat</label>
+    <div id="chat">
+        
+    </div>
+    
     <p>
       Komunikat:&nbsp;
-      <input id="text">&nbsp;<input id="send" type="button" value="Wyślij">
+      <input id="messageText">&nbsp;<input id="send" type="button" value="Wyślij">
     </p>
-    <p id="message"></p>
+    
   </div>
   <script src="/socket.io/socket.io.js"></script>
   <script src="/js/jquery.min.js"></script>

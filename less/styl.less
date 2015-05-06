@@ -1,6 +1,16 @@
-// out: ../public/css/app.css, compress: true
+// out: ../public/css/styl.css, compress: true
 @bgColor: #eee;
+@chat-height: 400px;
 
 body {
 	background-color: @bgColor;
+}
+
+#chat {
+    background-color: white;
+    border: 1px solid black;
+    height: @chat-height;
+    padding: 1em;
+
+    word-wrap: break-word;
 }
