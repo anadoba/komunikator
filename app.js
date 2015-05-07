@@ -21,9 +21,19 @@ var chatHistory = [];
 
 io.sockets.on("connection", function (socket) {
     socket.on("login", function (data) {
-        io.sockets.emit("chat", "Użytkownik <b>" + data + "</b> dołączył do chatu.");
+        var currentTime = new Date();
+        var entry = new ChatEntry(currentTime.getHours() + ':' + currentTime.getMinutes() + ':' + currentTime.getSeconds(), data, ' dołączył do chatu.');
+        
         var user = new ChatUser(socket.id, data);
         loggedInUsers.push(user);
+        for(var index in chatHistory) { 
+            var attr = chatHistory[index]; 
+            socket.emit('chat', attr.time + " <b>" + attr.login + "</b>: " + attr.message);
+        }
+        
+        chatHistory.push(entry);
+        io.sockets.emit("chat", entry.time + " <b>" + entry.login + "</b>: " + entry.message);
+        
         console.log(user);
     });
     socket.on("message", function (data) {
