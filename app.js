@@ -13,14 +13,25 @@ app.use('/js/jquery.min.js', static(__dirname + '/bower_components/jquery/dist/j
 app.use('/js/jquery.min.map', static(__dirname + '/bower_components/jquery/dist/jquery.min.map'));
 app.use(static(__dirname + '/public'));
 
+var ChatEntry = require('./model/chatEntry');
+var ChatUser = require('./model/chatUser');
+
+var loggedInUsers = [];
+var chatHistory = [];
+
 io.sockets.on("connection", function (socket) {
     socket.on("login", function (data) {
         io.sockets.emit("chat", "Użytkownik <b>" + data + "</b> dołączył do chatu.");
-        console.log(data);
+        var user = new ChatUser(socket.id, data);
+        loggedInUsers.push(user);
+        console.log(user);
     });
     socket.on("message", function (data) {
-        io.sockets.emit("chat", "<b>" + data.login + "</b>: " + data.message);
-        console.log(data);
+        var currentTime = new Date();
+        var entry = new ChatEntry(currentTime.getHours() + ':' + currentTime.getMinutes() + ':' + currentTime.getSeconds(), data.login, data.message);
+        chatHistory.push(entry);
+        io.sockets.emit("chat", entry.time + " <b>" + entry.login + "</b>: " + entry.message);
+        console.log(entry);
     });
     socket.on("error", function (err) {
         console.dir(err);
