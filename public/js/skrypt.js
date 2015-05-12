@@ -3,33 +3,54 @@
 /* global $: false */
 "use strict";
 
-// Inicjalizacja
-
 // jQuery
 $(document).ready(function () {
     var socket;
     
+    $('#loginText').on('input', function() {
+       if (this.value.length === 0) {
+           $('#open').prop("disabled", true);
+       } else {
+           $('#open').prop("disabled", false);
+       }
+    });
+    
     // Stan wejściowy
     $('#status').text = "Brak połączenia";
     $('#close').prop("disabled", true);
+    $('#open').prop("disabled", true);
     $('#send').prop("disabled", true);
     
     // Po kliknięciu guzika „Połącz” tworzymy nowe połączenie WS
     $('#open').click(function () {
-        $('#open').prop("disabled", true);
+        //$('#open').prop("disabled", true);
         if (!socket || !socket.connected) {
             socket = io({forceNew: true});
         }
         socket.on('connect', function () {
-            $('#close').prop("disabled", false);
-            $('#send').prop("disabled", false);
-            $('#status').prop("src", "img/bullet_green.png");
             console.log('Nawiązano połączenie przez Socket.io');
+            socket.emit('login', $('#loginText').val());
+        });
+        socket.on('loginResponse', function (data) {
+            if (data.success === true) {
+                $('#close').prop("disabled", false);
+                $('#send').prop("disabled", false);
+                $('#status').prop("src", "img/bullet_green.png");
+                
+                $('#loginContainer').append(data.message);
+                $('#open').prop("disabled", true);
+                $('#loginText').prop("disabled", true);
+            } else {
+                $('#loginContainer').append("<br /> " + data.message);
+                socket.io.disconnect();
+            }
         });
         socket.on('disconnect', function () {
             $('#open').prop("disabled", false);
             $('#status').prop("src", "img/bullet_red.png");
+            $('#chat').html("");
             console.log('Połączenie przez Socket.io zostało zakończone');
+            $('#loginText').prop("disabled", false);
         });
         socket.on("error", function (err) {
             $('#message').text("Błąd połączenia z serwerem: '" + JSON.stringify(err) + "'");
@@ -37,12 +58,6 @@ $(document).ready(function () {
         socket.on("chat", function (data) {
             $('#chat').append(data + "<br />");
         });
-    });
-    
-    // Ustaw login
-    $('#login').click(function () {
-        socket.emit('login', $('#loginText').val());
-        console.log('Zalogowany jako: ' + $('#loginText').val());
     });
     
     // Zamknij połączenie po kliknięciu guzika „Rozłącz”
